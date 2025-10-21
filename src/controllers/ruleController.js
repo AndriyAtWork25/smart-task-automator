@@ -1,32 +1,58 @@
 const Rule = require('../models/Rule');
 
 exports.createRule = async (req, res) => {
-  const { name, trigger, action } = req.body;
-  const rule = await Rule.create({
-    owner: req.user._id,
-    name, trigger, action
-  });
-  res.json(rule);
+  try {
+    const rule = await Rule.create({ ...req.body, user: req.user._id });
+    res.status(201).json(rule);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
 };
 
-exports.listRules = async (req, res) => {
-  const rules = await Rule.find({ owner: req.user._id });
-  res.json(rules);
+exports.getRules = async (req, res) => {
+  try {
+    const rules = await Rule.find({ user: req.user._id });
+    res.json(rules);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+exports.getRule = async (req, res) => {
+  try {
+    const rule = await Rule.findOne({ _id: req.params.id, user: req.user._id });
+    if (!rule) return res.status(404).json({ message: 'Rule not found' });
+    res.json(rule);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
 };
 
 exports.updateRule = async (req, res) => {
-  const rule = await Rule.findById(req.params.id);
-  if (!rule) return res.status(404).json({ message: 'No rule' });
-  if (!rule.owner.equals(req.user._id)) return res.status(403).json({ message: 'Forbidden' });
-  Object.assign(rule, req.body);
-  await rule.save();
-  res.json(rule);
+  try {
+    const rule = await Rule.findOneAndUpdate(
+      { _id: req.params.id, user: req.user._id },
+      req.body,
+      { new: true }
+    );
+    if (!rule) return res.status(404).json({ message: 'Rule not found' });
+    res.json(rule);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
 };
 
 exports.deleteRule = async (req, res) => {
-  const rule = await Rule.findById(req.params.id);
-  if (!rule) return res.status(404).json({ message: 'No rule' });
-  if (!rule.owner.equals(req.user._id)) return res.status(403).json({ message: 'Forbidden' });
-  await rule.remove();
-  res.json({ ok: true });
+  try {
+    const rule = await Rule.findOneAndDelete({ _id: req.params.id, user: req.user._id });
+    if (!rule) return res.status(404).json({ message: 'Rule not found' });
+    res.json({ message: 'Rule deleted' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
 };
