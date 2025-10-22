@@ -1,28 +1,14 @@
-import mongoose from "mongoose";
+const mongoose = require('mongoose');
 
 const ruleSchema = new mongoose.Schema({
-  triggerType: {
-    type: String,
-    required: true
-  },
-  actionType: {
-    type: String,
-    required: true
-  },
-  config: {
-    type: Object,
-    required: true
-  },
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  }
-});
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  name: { type: String, required: true },
+  description: { type: String },
+  triggerType: { type: String, enum: ['time', 'event'], default: 'time' },
+  triggerValue: { type: String }, // наприклад cron або подія
+  actionType: { type: String, enum: ['log', 'telegram'], default: 'log' },
+  actionConfig: { type: Object }, // тут налаштування action
+  isActive: { type: Boolean, default: true },
+}, { timestamps: true });
 
-const Rule = mongoose.model("Rule", ruleSchema);
-export default Rule;
+module.exports = mongoose.model('Rule', ruleSchema);

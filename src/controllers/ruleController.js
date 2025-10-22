@@ -1,7 +1,13 @@
 const Rule = require('../models/Rule');
+const { ruleSchema } = require('../validators/ruleValidator'); 
 
 exports.createRule = async (req, res) => {
   try {
+    const { error } = ruleSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
+
     const rule = await Rule.create({ ...req.body, user: req.user._id });
     res.status(201).json(rule);
   } catch (err) {
@@ -33,6 +39,12 @@ exports.getRule = async (req, res) => {
 
 exports.updateRule = async (req, res) => {
   try {
+    // ✅ Перевірка перед оновленням
+    const { error } = ruleSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
+
     const rule = await Rule.findOneAndUpdate(
       { _id: req.params.id, user: req.user._id },
       req.body,
