@@ -11,6 +11,13 @@ async function pollOnce() {
     for (const rule of rules) {
       const events = await fetchEventsForRule(rule);
       for (const evt of events) {
+
+        // ✅ ось тут вставляємо перевірку:
+        if (!rule.enabled) {
+          console.log(`Rule ${rule._id} вимкнено — пропускаємо`);
+          continue;
+        }
+
         try {
           if (await isAlreadyProcessed(rule, evt.eventId)) {
             // пропускаємо дублікат
