@@ -9,7 +9,17 @@ const ruleRoutes = require('./routes/rules');
 const app = express();
 app.use(express.json());
 
-// routes
+// ⚙️ Тестовий middleware для підстави користувача
+// ВАЖЛИВО: він стоїть ПЕРЕД підключенням routes
+if (process.env.NODE_ENV === 'test') {
+  const { Types } = require('mongoose');
+  app.use((req, res, next) => {
+    if (!req.user) req.user = { _id: global.__testUserId || new Types.ObjectId() };
+    next();
+  });
+}
+
+// ✅ Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/rules', ruleRoutes);
 

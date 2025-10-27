@@ -7,22 +7,22 @@ const { isAlreadyProcessed, markProcessed } = require('../utils/idempotency');
 
 async function pollOnce() {
   try {
-    const rules = await Rule.find({ enabled: true }).limit(100);
+    // Тепер завжди беремо всі правила, а не тільки активні
+    const rules = await Rule.find().limit(100);
+
     for (const rule of rules) {
+      if (!rule.isActive) {
+        console.log(`Rule ${rule._id} вимкнено — пропускаємо`);
+        continue;
+      }
+
       const events = await fetchEventsForRule(rule);
       for (const evt of events) {
-
-        // ✅ ось тут вставляємо перевірку:
-        if (!rule.enabled) {
-          console.log(`Rule ${rule._id} вимкнено — пропускаємо`);
-          continue;
-        }
-
         try {
           if (await isAlreadyProcessed(rule, evt.eventId)) {
-            // пропускаємо дублікат
             continue;
           }
+
           const result = await executeActionForRule(rule, evt);
           await ExecutionLog.create({
             rule: rule._id,
@@ -31,6 +31,7 @@ async function pollOnce() {
             detail: result.message,
             error: result.ok ? null : result.message
           });
+
           if (result.ok) await markProcessed(rule, evt.eventId);
         } catch (e) {
           console.error('action error', e);
@@ -48,7 +49,7 @@ async function pollOnce() {
   }
 }
 
-function startPoller(intervalMs = 10000) { // кожні 10s для тесту
+function startPoller(intervalMs = 10000) {
   console.log('Poller started, interval', intervalMs);
   pollOnce();
   setInterval(pollOnce, intervalMs);

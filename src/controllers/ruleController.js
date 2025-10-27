@@ -1,14 +1,35 @@
 const Rule = require('../models/Rule');
-const { ruleSchema } = require('../validators/ruleValidator'); 
+const { ruleSchema } = require('../validators/ruleValidator');
 
 exports.createRule = async (req, res) => {
   try {
-    const { error } = ruleSchema.validate(req.body);
-    if (error) {
-      return res.status(400).json({ message: error.details[0].message });
+    const body = { ...req.body };
+
+    // Підтримка старого формату
+    if (body.trigger && typeof body.trigger === 'object') {
+      body.triggerType = body.trigger.type || 'event';
+      body.triggerValue = body.trigger.config?.keyword || 'default';
+      delete body.trigger;
+    }
+    if (body.action && typeof body.action === 'object') {
+      body.actionType = body.action.type || 'log';
+      body.actionConfig = body.action.config || {};
+      delete body.action;
     }
 
-    const rule = await Rule.create({ ...req.body, user: req.user._id });
+    // Підставляємо користувача
+    body.user = req.user._id.toString();
+
+   // Валідація
+const { error } = ruleSchema.validate(body);
+if (error) {
+  const message = error.details?.[0]?.message || 'Validation failed';
+  console.log('❌ Validation error:', message, body);
+  return res.status(400).json({ message });
+}
+
+
+    const rule = await Rule.create(body);
     res.status(201).json(rule);
   } catch (err) {
     console.error(err);
@@ -39,15 +60,27 @@ exports.getRule = async (req, res) => {
 
 exports.updateRule = async (req, res) => {
   try {
-    // ✅ Перевірка перед оновленням
-    const { error } = ruleSchema.validate(req.body);
-    if (error) {
-      return res.status(400).json({ message: error.details[0].message });
+    const body = { ...req.body };
+
+    // Підтримка старого формату
+    if (body.trigger && typeof body.trigger === 'object') {
+      body.triggerType = body.trigger.type || 'event';
+      body.triggerValue = body.trigger.config?.keyword || 'default';
+      delete body.trigger;
     }
+    if (body.action && typeof body.action === 'object') {
+      body.actionType = body.action.type || 'log';
+      body.actionConfig = body.action.config || {};
+      delete body.action;
+    }
+
+    // Не передаємо user у findOneAndUpdate, він лиш для перевірки
+    const { error } = ruleSchema.validate({ ...body, user: req.user._id.toString() });
+    if (error) return res.status(400).json({ message: error.details[0].message });
 
     const rule = await Rule.findOneAndUpdate(
       { _id: req.params.id, user: req.user._id },
-      req.body,
+      body,
       { new: true }
     );
     if (!rule) return res.status(404).json({ message: 'Rule not found' });
@@ -68,3 +101,4 @@ exports.deleteRule = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+

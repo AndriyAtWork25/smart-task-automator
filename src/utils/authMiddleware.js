@@ -1,4 +1,3 @@
-// src/utils/authMiddleware.js
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
@@ -7,7 +6,8 @@ module.exports = async (req, res, next) => {
   if (!auth) return res.status(401).json({ message: 'No authorization header' });
 
   const parts = auth.split(' ');
-  if (parts.length !== 2 || parts[0] !== 'Bearer') return res.status(401).json({ message: 'Invalid auth format' });
+  if (parts.length !== 2 || parts[0] !== 'Bearer')
+    return res.status(401).json({ message: 'Invalid auth format' });
 
   const token = parts[1];
   try {

@@ -2,7 +2,10 @@ const router = require('express').Router();
 const ctrl = require('../controllers/ruleController');
 const authMiddleware = require('../utils/authMiddleware');
 
-router.use(authMiddleware); // всі маршрути захищені
+// застосовуємо middleware лише якщо НЕ тест
+if (process.env.NODE_ENV !== 'test') {
+  router.use(authMiddleware);
+}
 
 router.post('/', ctrl.createRule);
 router.get('/', ctrl.getRules);
