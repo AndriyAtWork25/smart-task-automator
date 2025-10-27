@@ -1,4 +1,3 @@
-// src/app.js
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
@@ -9,14 +8,14 @@ const ruleRoutes = require('./routes/rules');
 const app = express();
 app.use(express.json());
 
-// ⚙️ Тестовий middleware для підстави користувача
-// ВАЖЛИВО: він стоїть ПЕРЕД підключенням routes
-if (process.env.NODE_ENV === 'test') {
-  const { Types } = require('mongoose');
-  app.use((req, res, next) => {
-    if (!req.user) req.user = { _id: global.__testUserId || new Types.ObjectId() };
-    next();
-  });
+// 🧠 Підключення до бази робиться лише в продакшені/локальному режимі.
+// У тестах цим керує jest-mongo-setup.js.
+if (process.env.NODE_ENV !== 'test') {
+  const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/smart-automator';
+  mongoose
+    .connect(MONGO_URI)
+    .then(() => console.log('[DB] Connected'))
+    .catch((err) => console.error('[DB] Connection error:', err));
 }
 
 // ✅ Routes

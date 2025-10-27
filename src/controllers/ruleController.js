@@ -1,3 +1,4 @@
+// src/controllers/ruleController.js
 const Rule = require('../models/Rule');
 const { ruleSchema } = require('../validators/ruleValidator');
 
@@ -18,7 +19,7 @@ exports.createRule = async (req, res) => {
     }
 
     // Підставляємо користувача
-    body.user = req.user._id.toString();
+    body.user = req.user._id;
 
    // Валідація
 const { error } = ruleSchema.validate(body);
@@ -75,7 +76,7 @@ exports.updateRule = async (req, res) => {
     }
 
     // Не передаємо user у findOneAndUpdate, він лиш для перевірки
-    const { error } = ruleSchema.validate({ ...body, user: req.user._id.toString() });
+    const { error } = ruleSchema.validate({ ...body, user: req.user._id });
     if (error) return res.status(400).json({ message: error.details[0].message });
 
     const rule = await Rule.findOneAndUpdate(

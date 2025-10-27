@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "jest --runInBand",
+    "test": "cross-env NODE_ENV=test jest --runInBand --detectOpenHandles",
     "dev": "nodemon src/server.js",
     "start": "node src/server.js"
   },
@@ -22,9 +22,16 @@
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
+    "cross-env": "^10.1.0",
     "jest": "^30.2.0",
     "mongodb-memory-server": "^10.2.3",
     "nodemon": "^3.1.10",
     "supertest": "^7.1.4"
+  },
+  "jest": {
+    "setupFilesAfterEnv": [
+      "<rootDir>/jest-mongo-setup.js"
+    ],
+    "testEnvironment": "node"
   }
 }

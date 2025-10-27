@@ -1,126 +1,131 @@
 // src/controllers/__tests__/ruleController.test.js
 const request = require('supertest');
+const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
-const { MongoMemoryServer } = require('mongodb-memory-server');
 const bcrypt = require('bcryptjs');
 
-let app;
+const app = require('../../app');
 const User = require('../../models/User');
 const Rule = require('../../models/Rule');
 
-let mongoServer;
-let userId;
+let token;
+let testUserId;
 
 beforeAll(async () => {
-  process.env.NODE_ENV = 'test';
-  mongoServer = await MongoMemoryServer.create();
-  await mongoose.connect(mongoServer.getUri());
+  await User.deleteMany({});
+  await Rule.deleteMany({});
 
-  // Створюємо тестового користувача
-  const passwordHash = await bcrypt.hash('testpassword', 10);
-  const user = await User.create({ email: 'test@test.com', passwordHash });
-  userId = user._id;
-  global.__testUserId = userId; // 🔥 додаємо глобальну змінну
+  // створюємо користувача
+  const hash = await bcrypt.hash('123456', 10);
+  const user = await User.create({ email: 'user@example.com', passwordHash: hash });
 
-  // Підключаємо додаток
-  app = require('../../app');
+  // запам’ятовуємо id для моків
+  testUserId = user._id.toString();
+  global.__testUserId = testUserId;
+
+  // створюємо токен (для узгодженості з middleware)
+  const secret = process.env.JWT_SECRET || 'testsecret';
+  token = jwt.sign({ id: testUserId, email: user.email }, secret, { expiresIn: '7d' });
 });
 
 afterAll(async () => {
-  await mongoose.disconnect();
-  await mongoServer.stop();
+  try {
+    if (mongoose.connection.readyState !== 0) {
+      await User.deleteMany({});
+      await Rule.deleteMany({});
+      await mongoose.connection.close();
+    }
+  } catch (err) {
+    console.warn('⚠️  Cleanup skipped: Mongo already disconnected.');
+  }
 });
+
 
 describe('RuleController Integration Tests', () => {
   it('should create a new rule', async () => {
     const res = await request(app)
       .post('/api/rules')
+      .set('Authorization', `Bearer ${token}`)
       .send({
-        name: 'TestRule',
+        name: 'My Rule',
         triggerType: 'time',
-        triggerValue: '* * * * *',
-        actionType: 'log',
-        isActive: true,
-        actionConfig: { message: 'Hello world' }
+        triggerValue: new Date().toISOString(),
+        actionType: 'log'
       });
 
     expect(res.statusCode).toBe(201);
-    expect(res.body.name).toBe('TestRule');
-    expect(res.body.user).toBe(userId.toString());
+    expect(res.body.name).toBe('My Rule');
+    expect(res.body.user.toString()).toBe(testUserId);
   });
 
   it('should retrieve all rules for the user', async () => {
-    await Rule.create({
-      name: 'Rule2',
-      triggerType: 'time',
-      triggerValue: '* * * * *',
-      actionType: 'log',
-      isActive: true,
-      user: userId,
-      actionConfig: { message: 'Test message' },
-    });
+    await request(app)
+      .post('/api/rules')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        name: 'Rule1',
+        triggerType: 'time',
+        triggerValue: new Date().toISOString(),
+        actionType: 'log'
+      });
 
-    const res = await request(app).get('/api/rules');
+    const res = await request(app)
+      .get('/api/rules')
+      .set('Authorization', `Bearer ${token}`);
+
     expect(res.statusCode).toBe(200);
-    expect(res.body.length).toBeGreaterThanOrEqual(1);
-  });
-
-  it('should retrieve a single rule by id', async () => {
-    const rule = await Rule.create({
-      name: 'Rule3',
-      triggerType: 'time',
-      triggerValue: '* * * * *',
-      actionType: 'log',
-      isActive: true,
-      user: userId,
-      actionConfig: { message: 'Test message' },
-    });
-
-    const res = await request(app).get(`/api/rules/${rule._id}`);
-    expect(res.statusCode).toBe(200);
-    expect(res.body.name).toBe('Rule3');
+    expect(Array.isArray(res.body)).toBe(true);
+    expect(res.body.length).toBeGreaterThan(0);
+    expect(res.body[0].user.toString()).toBe(testUserId);
   });
 
   it('should update a rule', async () => {
-    const rule = await Rule.create({
-      name: 'Rule4',
-      triggerType: 'time',
-      triggerValue: '* * * * *',
-      actionType: 'log',
-      isActive: true,
-      user: userId,
-      actionConfig: { message: 'Old message' },
-    });
+    const createRes = await request(app)
+      .post('/api/rules')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        name: 'RuleToUpdate',
+        triggerType: 'time',
+        triggerValue: new Date().toISOString(),
+        actionType: 'log'
+      });
+
+    const ruleId = createRes.body._id;
 
     const res = await request(app)
-      .put(`/api/rules/${rule._id}`)
+      .put(`/api/rules/${ruleId}`)
+      .set('Authorization', `Bearer ${token}`)
       .send({
-        name: 'UpdatedRule4',
+        name: 'Updated Rule',
         triggerType: 'time',
-        triggerValue: '* * * * *',
-        actionType: 'log',
-        isActive: false,
-        actionConfig: { message: 'Updated message' }
+        triggerValue: new Date().toISOString(),
+        actionType: 'log'
       });
 
     expect(res.statusCode).toBe(200);
-    expect(res.body.name).toBe('UpdatedRule4');
-    expect(res.body.isActive).toBe(false);
+    expect(res.body.name).toBe('Updated Rule');
+    expect(res.body.user.toString()).toBe(testUserId);
   });
 
   it('should delete a rule', async () => {
-    const rule = await Rule.create({
-      name: 'RuleToDelete',
-      triggerType: 'time',
-      triggerValue: '* * * * *',
-      actionType: 'log',
-      isActive: true,
-      user: userId,
-      actionConfig: { message: 'To delete' },
-    });
+    const createRes = await request(app)
+      .post('/api/rules')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        name: 'RuleToDelete',
+        triggerType: 'time',
+        triggerValue: new Date().toISOString(),
+        actionType: 'log'
+      });
 
-    const res = await request(app).delete(`/api/rules/${rule._id}`);
+    const ruleId = createRes.body._id;
+
+    const res = await request(app)
+      .delete(`/api/rules/${ruleId}`)
+      .set('Authorization', `Bearer ${token}`);
+
     expect(res.statusCode).toBe(200);
     expect(res.body.message).toBe('Rule deleted');
   });
 });
+

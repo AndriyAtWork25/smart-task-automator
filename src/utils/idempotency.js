@@ -1,4 +1,4 @@
-// simple idempotency: check lastProcessedEventId on rule
+// src/utils/idempotency.js
 async function isAlreadyProcessed(rule, eventId) {
   return rule.lastProcessedEventId === eventId;
 }
