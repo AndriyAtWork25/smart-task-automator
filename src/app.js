@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 
 const authRoutes = require('./routes/auth');
 const ruleRoutes = require('./routes/rules');
+const testRoutes = require('./routes/test'); 
 
 const app = express();
 app.use(express.json());
@@ -21,6 +22,7 @@ if (process.env.NODE_ENV !== 'test') {
 // ✅ Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/rules', ruleRoutes);
+app.use('/api/test', testRoutes);
 
 app.get('/', (req, res) => res.send('Smart Automator API running'));
 
