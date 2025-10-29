@@ -83,6 +83,75 @@ eventBus.on('trigger:event', async (data) => {
   }
 });
 
+// ---------------- TIME-BASED TRIGGER ----------------
+eventBus.on('trigger:time', async (data) => {
+  console.log('⏰ Worker got trigger:time:', data);
+  try {
+    const rules = await Rule.find({ triggerType: 'time', isActive: true });
+
+    for (const rule of rules) {
+      for (const evt of data.events) {
+        try {
+          const result = await executeActionForRule(rule, evt);
+          await ExecutionLog.create({
+            rule: rule._id,
+            eventId: evt.eventId,
+            status: result.ok ? 'success' : 'failed',
+            detail: result.message,
+            error: result.ok ? null : result.message
+          });
+        } catch (err) {
+          console.error('❌ Worker time trigger error:', err);
+          await ExecutionLog.create({
+            rule: rule._id,
+            eventId: evt.eventId,
+            status: 'failed',
+            error: err.message
+          });
+        }
+      }
+    }
+  } catch (err) {
+    console.error('💥 Worker time handler error:', err);
+  }
+});
+
+// ---------------- WEBHOOK TRIGGER ----------------
+eventBus.on('trigger:webhook', async (data) => {
+  console.log('🌐 Worker got trigger:webhook:', data);
+  try {
+    const rules = await Rule.find({ triggerType: 'webhook', isActive: true });
+
+    for (const rule of rules) {
+      if (rule._id.toString() === data.ruleId.toString()) {
+        for (const evt of data.events) {
+          try {
+            const result = await executeActionForRule(rule, evt);
+            await ExecutionLog.create({
+              rule: rule._id,
+              eventId: evt.eventId,
+              status: result.ok ? 'success' : 'failed',
+              detail: result.message,
+              error: result.ok ? null : result.message
+            });
+          } catch (err) {
+            console.error('❌ Worker webhook trigger error:', err);
+            await ExecutionLog.create({
+              rule: rule._id,
+              eventId: evt.eventId,
+              status: 'failed',
+              error: err.message
+            });
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.error('💥 Worker webhook handler error:', err);
+  }
+});
+
+
 // ---------------- START FUNCTION ----------------
 function startPoller(intervalMs = 10000) {
   console.log(`🚀 Poller started (interval ${intervalMs / 1000}s)`);

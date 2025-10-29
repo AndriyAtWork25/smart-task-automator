@@ -1,43 +1,45 @@
 // src/services/triggerService.js
-const eventBus = require('../utils/eventBus'); // ✅ NEW
+const eventBus = require('../utils/eventBus');
 
-// Returns a mock list of events (eventId and payload)
+// ---------------- FETCH EVENTS ----------------
 async function fetchEventsForRule(rule) {
-  // Mock behavior for now
-  if (rule.triggerType === 'event') {
-    // Optional keyword from triggerValue
-    const keyword = rule.triggerValue || 'invoice';
+  const now = new Date();
 
-    // Randomly generate an event sometimes
+  // ---- Тип 1: подія (як було) ----
+  if (rule.triggerType === 'event') {
+    const keyword = rule.triggerValue || 'invoice';
     if (Math.random() < 0.3) {
       const id = `evt_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
-      const events = [
-        {
-          eventId: id,
-          payload: { subject: `New ${keyword} ${id}`, body: '...' },
-        },
-      ];
-
-      // ✅ NEW: emit trigger event to the worker
-      eventBus.emit(`trigger:${rule.triggerType}`, {
-        userId: rule.user,
-        ruleId: rule._id,
-        events,
-      });
-
+      const events = [{ eventId: id, payload: { subject: `New ${keyword}`, body: '...' } }];
+      eventBus.emit(`trigger:event`, { userId: rule.user, ruleId: rule._id, events });
       return events;
-    } else {
-      return [];
     }
+    return [];
   }
 
-  // Later: implement actual polling for cron/time triggers
+  // ---- Тип 2: cron/time ----
+  if (rule.triggerType === 'time') {
+    // Наприклад, кожну хвилину або через певний інтервал у секундах
+    const intervalSec = parseInt(rule.triggerValue || '60', 10);
+    if (!rule._lastExecution || now - rule._lastExecution > intervalSec * 1000) {
+      const id = `time_${Date.now()}`;
+      const events = [{ eventId: id, payload: { time: now.toISOString() } }];
+      eventBus.emit(`trigger:time`, { userId: rule.user, ruleId: rule._id, events });
+      rule._lastExecution = now; // локальна мітка, не пишемо в базу
+      return events;
+    }
+    return [];
+  }
+
+  // ---- Тип 3: webhook ----
+  // Webhook не створюється автоматично, його запускає ручний виклик handleTrigger()
+
   return [];
 }
 
-// ✅ OPTIONAL: helper for manual trigger (e.g., from controllers)
+// ---------------- MANUAL TRIGGER ----------------
 function handleTrigger(triggerType, payload) {
   eventBus.emit(`trigger:${triggerType}`, payload);
 }
 
-module.exports = { fetchEventsForRule, handleTrigger }; // ✅ updated export
+module.exports = { fetchEventsForRule, handleTrigger };
