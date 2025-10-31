@@ -14,4 +14,4 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
     console.error('Mongo connection error', err);
     process.exit(1);
   });
-  startPoller(15000); // кожні 15 секунд — для тестування
+  startPoller(60000); 

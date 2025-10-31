@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Smart Automator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="bg-grid"></div>
+
+  <header class="topbar">
+    <div class="logo">
+      <div class="logo-dot"></div>
+      <span>Smart Automator</span>
+    </div>
+    <div class="env-pill" id="api-status">API: checking...</div>
+  </header>
+
+  <main class="layout">
+    <section class="left">
+      <h1 class="title">Automation panel</h1>
+      <p class="subtitle">
+        Create rules, trigger them and watch worker reactions in real time.
+      </p>
+
+      <div class="card">
+        <h2>Create rule</h2>
+        <label>
+          Rule name
+          <input id="name" placeholder="Telegram alert on webhook" />
+        </label>
+
+        <label>
+          Trigger type
+          <select id="triggerType">
+            <option value="webhook">webhook</option>
+            <option value="event">event</option>
+            <option value="time">time</option>
+          </select>
+        </label>
+
+        <label id="triggerValueWrapper">
+          Trigger value (seconds / keyword)
+          <input id="triggerValue" placeholder="60" />
+        </label>
+
+        <label>
+          Action type
+          <select id="actionType">
+            <option value="log">log</option>
+            <option value="telegram">telegram</option>
+            <option value="http_request">http_request</option>
+          </select>
+        </label>
+
+        <div id="actionTelegram" class="action-extra hidden">
+          <label>
+            Telegram chatId
+            <input id="tgChatId" placeholder="123456789" />
+          </label>
+          <label>
+            Message
+            <input id="tgMessage" placeholder="🔥 Smart automator triggered!" />
+          </label>
+        </div>
+
+        <div id="actionHttp" class="action-extra hidden">
+          <label>
+            Request URL
+            <input id="httpUrl" placeholder="https://jsonplaceholder.typicode.com/todos/1" />
+          </label>
+          <label>
+            Method
+            <select id="httpMethod">
+              <option value="GET">GET</option>
+              <option value="POST">POST</option>
+            </select>
+          </label>
+        </div>
+
+        <button id="createBtn" class="primary-btn">Create rule</button>
+        <p class="hint" id="createHint"></p>
+      </div>
+
+      <div class="card">
+        <h2>Trigger rule</h2>
+        <label>
+          Rule ID
+          <input id="ruleId" placeholder="paste rule _id here" />
+        </label>
+        <button id="triggerBtn" class="secondary-btn">Trigger</button>
+      </div>
+    </section>
+
+    <section class="right">
+      <div class="brain">
+        <div class="brain-inner">
+          <h3>Worker activity</h3>
+          <p class="small">Latest responses from API</p>
+        </div>
+      </div>
+
+      <div class="log-panel">
+        <div class="log-header">
+          <span>Response</span>
+          <button id="clearLog" class="small-btn">Clear</button>
+        </div>
+        <pre id="result" class="log-body">Waiting for actions...</pre>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
+
