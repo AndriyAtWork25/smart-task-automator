@@ -40,10 +40,6 @@
           </select>
         </label>
 
-        <label id="triggerValueWrapper">
-          Trigger value (seconds / keyword)
-          <input id="triggerValue" placeholder="60" />
-        </label>
 
         <label>
           Action type
@@ -93,23 +89,36 @@
       </div>
     </section>
 
-    <section class="right">
-      <div class="brain">
-        <div class="brain-inner">
-          <h3>Worker activity</h3>
-          <p class="small">Latest responses from API</p>
-        </div>
-      </div>
+  <section class="right">
+  <div class="card small-card">
+    <h2>Manage rule</h2>
+    <label>
+      Rule ID
+      <input id="ruleIdManage" placeholder="paste rule _id here" />
+    </label>
 
-      <div class="log-panel">
-        <div class="log-header">
-          <span>Response</span>
-          <button id="clearLog" class="small-btn">Clear</button>
-        </div>
-        <pre id="result" class="log-body">Waiting for actions...</pre>
-      </div>
-    </section>
-  </main>
+    <div class="mini-controls">
+      <button id="stopRuleBtn" class="mini-btn">🛑 Stop</button>
+      <button id="deleteRuleBtn" class="mini-btn danger">✖ Delete</button>
+    </div>
+  </div>
+
+  <div class="brain">
+    <div class="brain-inner">
+      <h3>Worker activity</h3>
+      <p class="small">Latest responses from API</p>
+    </div>
+  </div>
+
+  <div class="log-panel">
+    <div class="log-header">
+      <span>Response</span>
+      <button id="clearLog" class="small-btn">Clear</button>
+    </div>
+    <pre id="result" class="log-body">Waiting for actions...</pre>
+  </div>
+</section>
+
 
   <script src="app.js"></script>
 </body>

@@ -279,3 +279,95 @@ select:focus {
     order: -1;
   }
 }
+
+/* ----- Manage Rule Section (compact style) ----- */
+.small-card {
+  padding: 12px 14px 10px;
+}
+
+.mini-controls {
+  display: flex;
+  justify-content: flex-start;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.mini-btn {
+  background: rgba(0, 224, 255, 0.08);
+  border: 1px solid rgba(0, 224, 255, 0.25);
+  color: var(--text);
+  font-size: 0.7rem;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.15s ease;
+}
+
+.mini-btn:hover {
+  background: rgba(0, 224, 255, 0.15);
+  border-color: rgba(0, 224, 255, 0.4);
+}
+
+.mini-btn.danger {
+  background: rgba(255, 93, 93, 0.08);
+  border: 1px solid rgba(255, 93, 93, 0.35);
+  color: #ffaaaa;
+}
+
+.mini-btn.danger:hover {
+  background: rgba(255, 93, 93, 0.18);
+  border-color: rgba(255, 93, 93, 0.5);
+}
+
+/* ----- Right panel adjustments ----- */
+.right {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* компактне manage rule */
+.small-card {
+  padding: 12px 14px 10px;
+  height: auto;
+  max-height: 140px; /* компактна висота */
+}
+
+.small-card input {
+  font-size: 0.78rem;
+  padding: 6px 8px;
+}
+
+.mini-controls {
+  display: flex;
+  justify-content: flex-start;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.mini-btn {
+  background: rgba(0, 224, 255, 0.08);
+  border: 1px solid rgba(0, 224, 255, 0.25);
+  color: var(--text);
+  font-size: 0.7rem;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.15s ease;
+}
+
+.mini-btn:hover {
+  background: rgba(0, 224, 255, 0.15);
+  border-color: rgba(0, 224, 255, 0.4);
+}
+
+.mini-btn.danger {
+  background: rgba(255, 93, 93, 0.08);
+  border: 1px solid rgba(255, 93, 93, 0.35);
+  color: #ffaaaa;
+}
+
+.mini-btn.danger:hover {
+  background: rgba(255, 93, 93, 0.18);
+  border-color: rgba(255, 93, 93, 0.5);
+}
