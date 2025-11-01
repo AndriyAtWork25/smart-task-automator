@@ -4,6 +4,114 @@ const ctrl = require('../controllers/ruleController');
 const authMiddleware = require('../utils/authMiddleware');
 const { handleTrigger } = require('../services/triggerService');
 
+/**
+ * @swagger
+ * tags:
+ *   name: Rules
+ *   description: Manage automation rules (create, update, delete, trigger)
+ */
+
+/**
+ * @swagger
+ * /api/rules:
+ *   get:
+ *     summary: Get all rules for the current user
+ *     tags: [Rules]
+ *     responses:
+ *       200:
+ *         description: List of rules retrieved successfully
+ *   post:
+ *     summary: Create a new rule
+ *     tags: [Rules]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               triggerType:
+ *                 type: string
+ *                 enum: [time, event, webhook]
+ *               triggerValue:
+ *                 type: string
+ *               actionType:
+ *                 type: string
+ *                 enum: [log, telegram, http_request]
+ *               actionConfig:
+ *                 type: object
+ *               isActive:
+ *                 type: boolean
+ *     responses:
+ *       201:
+ *         description: Rule created successfully
+ *
+ * /api/rules/{id}:
+ *   get:
+ *     summary: Get a single rule by ID
+ *     tags: [Rules]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Rule ID
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Rule details retrieved successfully
+ *   put:
+ *     summary: Update a rule by ID
+ *     tags: [Rules]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Rule ID
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Rule updated successfully
+ *   delete:
+ *     summary: Delete a rule by ID
+ *     tags: [Rules]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Rule ID
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Rule deleted successfully
+ *
+ * /api/rules/{id}/trigger:
+ *   post:
+ *     summary: Trigger a specific rule manually (webhook)
+ *     tags: [Rules]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Rule ID
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             description: Optional custom payload
+ *     responses:
+ *       200:
+ *         description: Rule triggered successfully
+ */
+
 // 🧩 Використовуємо справжнє middleware лише поза тестами
 if (process.env.NODE_ENV !== 'test') {
   router.use(authMiddleware);
