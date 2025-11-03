@@ -3,16 +3,16 @@ const mongoose = require('mongoose');
 
 const ruleSchema = new mongoose.Schema(
   {
-    // до кого належить правило
+    //owner of the rule
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
 
-    // назва правила
+    // name of the rule
     name: { type: String, required: true },
 
-    // короткий опис
+    // short description
     description: { type: String },
 
-    // 🔹 тип тригера: тепер підтримує 'time', 'event', 'webhook'
+    // trigger type: now supports 'time', 'event', 'webhook'
     triggerType: {
       type: String,
       enum: ['time', 'event', 'webhook'],
@@ -20,10 +20,10 @@ const ruleSchema = new mongoose.Schema(
       required: true
     },
 
-    // додаткове значення для тригера (наприклад, інтервал або ключове слово)
+    // added trigger value (e.g., cron expression, event keyword, webhook URL)
     triggerValue: { type: String, default: '' },
 
-    // 🔹 тип дії: тепер підтримує 'log', 'telegram', 'http_request'
+    // action type: supports 'log', 'telegram', 'http_request'
     actionType: {
       type: String,
       enum: ['log', 'telegram', 'http_request'],
@@ -31,10 +31,10 @@ const ruleSchema = new mongoose.Schema(
       required: true
     },
 
-    // конфіг об’єкта для конкретної дії (наприклад, { url, method })
+    // config for the action
     actionConfig: { type: Object, default: {} },
 
-    // чи активне правило
+    // if the rule is active
     isActive: { type: Boolean, default: true }
   },
   { timestamps: true }

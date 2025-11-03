@@ -326,11 +326,11 @@ select:focus {
   gap: 16px;
 }
 
-/* компактне manage rule */
+/* manage rule */
 .small-card {
   padding: 12px 14px 10px;
   height: auto;
-  max-height: 140px; /* компактна висота */
+  max-height: 140px; 
 }
 
 .small-card input {

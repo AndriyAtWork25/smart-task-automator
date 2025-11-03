@@ -6,7 +6,7 @@ exports.createRule = async (req, res) => {
   try {
     const body = { ...req.body };
 
-    // Підтримка старого формату
+    // old format support
     if (body.trigger && typeof body.trigger === 'object') {
       body.triggerType = body.trigger.type || 'event';
       body.triggerValue = body.trigger.config?.keyword || 'default';
@@ -18,10 +18,10 @@ exports.createRule = async (req, res) => {
       delete body.action;
     }
 
-    // Підставляємо користувача
+    // user assignment
     body.user = req.user._id;
 
-   // Валідація
+   // validation
 const { error } = ruleSchema.validate(body);
 if (error) {
   const message = error.details?.[0]?.message || 'Validation failed';
@@ -63,7 +63,7 @@ exports.updateRule = async (req, res) => {
   try {
     const body = { ...req.body };
 
-    // Підтримка старого формату
+    // support old format
     if (body.trigger && typeof body.trigger === 'object') {
       body.triggerType = body.trigger.type || 'event';
       body.triggerValue = body.trigger.config?.keyword || 'default';
@@ -75,7 +75,7 @@ exports.updateRule = async (req, res) => {
       delete body.action;
     }
 
-    // Не передаємо user у findOneAndUpdate, він лиш для перевірки
+    // dont forget user
     const { error } = ruleSchema.validate({ ...body, user: req.user._id });
     if (error) return res.status(400).json({ message: error.details[0].message });
 

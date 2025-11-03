@@ -1,6 +1,5 @@
 const API_BASE = "http://localhost:5000/api/rules";
-const TOKEN = localStorage.getItem("token") || ""; // якщо потім захочеш підставити
-
+const TOKEN = localStorage.getItem("token") || ""; 
 const resultEl = document.getElementById("result");
 const apiStatusEl = document.getElementById("api-status");
 const triggerTypeEl = document.getElementById("triggerType");

@@ -112,11 +112,11 @@ const { handleTrigger } = require('../services/triggerService');
  *         description: Rule triggered successfully
  */
 
-// 🧩 Використовуємо справжнє middleware лише поза тестами
+// use auth middleware for all routes below
 if (process.env.NODE_ENV !== 'test') {
   router.use(authMiddleware);
 } else {
-  // 🧪 У тестах підставляємо користувача, якого створює тест
+  // Mock auth middleware for tests
   router.use((req, res, next) => {
     if (global.__testUserId) {
       req.user = { _id: global.__testUserId, email: 'user@example.com' };
@@ -133,7 +133,7 @@ router.get('/:id', ctrl.getRule);
 router.put('/:id', ctrl.updateRule);
 router.delete('/:id', ctrl.deleteRule);
 
-// 🔹 Webhook для зовнішнього запуску правила
+// webhook trigger route
 router.post('/:id/trigger', async (req, res) => {
   try {
     const ruleId = req.params.id;

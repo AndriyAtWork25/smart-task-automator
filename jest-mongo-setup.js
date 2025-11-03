@@ -19,7 +19,6 @@ afterEach(async () => {
 });
 
 afterAll(async () => {
-  // Закриваємо лише якщо підключення активне
   if (mongoose.connection.readyState !== 0) {
     await mongoose.connection.close();
   }

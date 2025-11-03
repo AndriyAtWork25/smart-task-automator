@@ -15,15 +15,15 @@ beforeAll(async () => {
   await User.deleteMany({});
   await Rule.deleteMany({});
 
-  // створюємо користувача
+  // create test user
   const hash = await bcrypt.hash('123456', 10);
   const user = await User.create({ email: 'user@example.com', passwordHash: hash });
 
-  // запам’ятовуємо id для моків
+  // remember userId for tests
   testUserId = user._id.toString();
   global.__testUserId = testUserId;
 
-  // створюємо токен (для узгодженості з middleware)
+  // create JWT token
   const secret = process.env.JWT_SECRET || 'testsecret';
   token = jwt.sign({ id: testUserId, email: user.email }, secret, { expiresIn: '7d' });
 });

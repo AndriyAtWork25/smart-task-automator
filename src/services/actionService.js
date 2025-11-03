@@ -11,7 +11,7 @@ async function executeActionForRule(rule, event) {
 
     // 🔹 2. TELEGRAM (REAL)
     if (rule.actionType === 'telegram') {
-      const token = process.env.TELEGRAM_BOT_TOKEN; // твій токен із .env
+      const token = process.env.TELEGRAM_BOT_TOKEN; // from .env
       const chatId = rule.actionConfig?.chatId;
       const text =
         rule.actionConfig?.message ||

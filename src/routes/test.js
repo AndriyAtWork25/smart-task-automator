@@ -7,7 +7,7 @@ router.post('/trigger', async (req, res) => {
   try {
     const { triggerType = 'event', userId = 'demo-user' } = req.body;
 
-    // тестовий payload
+    // test payload
     const payload = {
       userId,
       events: [

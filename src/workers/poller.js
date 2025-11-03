@@ -4,7 +4,7 @@ const ExecutionLog = require('../models/ExecutionLog');
 const { fetchEventsForRule } = require('../services/triggerService');
 const { executeActionForRule } = require('../services/actionService');
 const { isAlreadyProcessed, markProcessed } = require('../utils/idempotency');
-const eventBus = require('../utils/eventBus'); // ✅ NEW
+const eventBus = require('../utils/eventBus'); 
 
 // ---------------- POLLING LOGIC ----------------
 async function pollOnce() {

@@ -21,5 +21,5 @@ mongoose
     process.exit(1);
   });
 
-// 🧠 Worker (poller) кожні 60 секунд
+// 🧠 Worker (poller) every 60 seconds
 startPoller(60000);

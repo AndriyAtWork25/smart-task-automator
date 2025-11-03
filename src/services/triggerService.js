@@ -5,7 +5,7 @@ const eventBus = require('../utils/eventBus');
 async function fetchEventsForRule(rule) {
   const now = new Date();
 
-  // ---- Тип 1: подія (як було) ----
+  // ---- Type 1: event-based ----
   if (rule.triggerType === 'event') {
     const keyword = rule.triggerValue || 'invoice';
     if (Math.random() < 0.3) {
@@ -17,22 +17,21 @@ async function fetchEventsForRule(rule) {
     return [];
   }
 
-  // ---- Тип 2: cron/time ----
+  // ---- Type 2: cron/time ----
   if (rule.triggerType === 'time') {
-    // Наприклад, кожну хвилину або через певний інтервал у секундах
     const intervalSec = parseInt(rule.triggerValue || '60', 10);
     if (!rule._lastExecution || now - rule._lastExecution > intervalSec * 1000) {
       const id = `time_${Date.now()}`;
       const events = [{ eventId: id, payload: { time: now.toISOString() } }];
       eventBus.emit(`trigger:time`, { userId: rule.user, ruleId: rule._id, events });
-      rule._lastExecution = now; // локальна мітка, не пишемо в базу
+      rule._lastExecution = now; 
       return events;
     }
     return [];
   }
 
-  // ---- Тип 3: webhook ----
-  // Webhook не створюється автоматично, його запускає ручний виклик handleTrigger()
+  // ---- Type 3: webhook ----
+  
 
   return [];
 }
