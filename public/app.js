@@ -65,14 +65,12 @@ actionTypeEl.addEventListener("change", () => {
 async function createRule() {
   const name = document.getElementById("name").value.trim();
   const triggerType = triggerTypeEl.value;
-  const triggerValue = document.getElementById("triggerValue").value.trim();
   const actionType = actionTypeEl.value;
 
   // базовий body
   const body = {
     name: name || "Untitled rule",
     triggerType,
-    triggerValue: triggerValue || "",
     actionType,
     actionConfig: {},
     isActive: true
