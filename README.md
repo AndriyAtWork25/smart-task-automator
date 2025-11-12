@@ -1,5 +1,10 @@
 # 🤖 Smart Automator
 
+### 🌍 Live Demo  
+- **App:** [smart-task-automator.onrender.com](https://smart-task-automator.onrender.com)  
+- **Swagger Docs:** [smart-task-automator.onrender.com/api-docs](https://smart-task-automator.onrender.com/api-docs)
+
+
 **Smart Automator** is a modern rule-based automation platform built with **Node.js**, **Express**, and **MongoDB**.  
 It allows users to create custom automation rules (“if this, then that”) that react to triggers such as time, events, or webhooks — and execute actions like sending Telegram messages, making HTTP requests, or simple logging.
 
