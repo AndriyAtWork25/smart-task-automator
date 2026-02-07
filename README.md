@@ -149,4 +149,4 @@ Andriy Tsar
 Back-End Developer | Node.js | Express | MongoDB
 
 
-“Automation doesn’t replace creativity — it gives humans time to use it.”
+“Automation doesn’t replace creativity, it gives humans time to use it.”
